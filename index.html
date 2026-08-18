@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeudasApp - Gestor de Deudas</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #6366f1;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --dark: #111827;
+            --gray: #6b7280;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --border: #e5e7eb;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f5f7fb;
+            color: var(--dark);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #4338ca, #6366f1);
+            color: white;
+            padding: 22px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.15);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,.18);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+        }
+
+        .logo p {
+            font-size: 13px;
+            opacity: .85;
+            margin-top: 3px;
+        }
+
+        /* CONTENEDOR */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* ESTADÍSTICAS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .stat-icon.total {
+            background: #eef2ff;
+        }
+
+        .stat-icon.pending {
+            background: #fff7ed;
+        }
+
+        .stat-icon.paid {
+            background: #ecfdf5;
+        }
+
+        .stat-icon.overdue {
+            background: #fef2f2;
+        }
+
+        .stat-info small {
+            color: var(--gray);
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .stat-info strong {
+            font-size: 21px;
+        }
+
+        /* PANEL */
+        .panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .panel-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .panel-header h2 {
+            font-size: 19px;
+        }
+
+        .panel-body {
+            padding: 25px;
+        }
+
+        /* FORMULARIO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px 13px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* BOTONES */
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1px solid #c7d2fe;
+        }
+
+        .btn-small {
+            padding: 7px 10px;
+            font-size: 12px;
+        }
+
+        /* HERRAMIENTAS */
+        .tools {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search {
+            flex: 1;
+            min-width: 220px;
+            position: relative;
+        }
+
+        .search input {
+            padding-left: 40px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 11px;
+            color: var(--gray);
+        }
+
+        .filter {
+            min-width: 170px;
+        }
+
+        /* TABLA */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 15px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: .2s;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .person {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .person-name {
+            font-weight: 600;
+        }
+
+        .person-concept {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .amount {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* ESTADOS */
+        .status {
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-pending {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .status-paid {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+
+        .status-overdue {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* EMPTY */
+        .empty {
+            padding: 55px 20px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 18px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .close {
+            background: transparent;
+            font-size: 22px;
+            color: var(--gray);
+            padding: 0;
+        }
+
+        /* NOTIFICACIÓN */
+        .toast {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            background: #111827;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: .3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 1000px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 650px) {
+            header {
+                padding: 18px;
+            }
+
+            .header-content {
+                align-items: flex-start;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 12px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .panel-body {
+                padding: 18px;
+            }
+
+            .tools {
+                flex-direction: column;
+            }
+
+            .filter {
+                width: 100%;
+            }
+
+            .search {
+                width: 100%;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-icon">💰</div>
+            <div>
+                <h1>DeudasApp</h1>
+                <p>Gestión sencilla de tus deudas</p>
+            </div>
+        </div>
+
+        <button class="btn-outline" onclick="exportarDatos()">
+            📥 Exportar
+        </button>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- ESTADÍSTICAS -->
+    <section class="stats">
+
+        <div class="stat-card">
+            <div class="stat-icon total">💰</div>
+            <div class="stat-info">
+                <small>Total registrado</small>
+                <strong id="totalRegistrado">S/ 0.00</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon pending">⏳</div>
+            <div class="stat-info">
+                <small>Total pendiente</small>
+                <strong id="totalPendiente">S/ 0.00</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon paid">✅</div>
+            <div class="stat-info">
+                <small>Total pagado</small>
+                <strong id="totalPagado">S/ 0.00</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon overdue">⚠️</div>
+            <div class="stat-info">
+                <small>Deudas vencidas</small>
+                <strong id="cantidadVencidas">0</strong>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FORMULARIO -->
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2 id="formTitle">➕ Registrar nueva deuda</h2>
+        </div>
+
+        <div class="panel-body">
+
+            <form id="deudaForm">
+
+                <input type="hidden" id="deudaId">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input
+                            type="text"
+                            id="nombre"
+                            placeholder="Ej. Juan Pérez"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha">Fecha *</label>
+                        <input
+                            type="date"
+                            id="fecha"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaLimite">Fecha límite</label>
+                        <input
+                            type="date"
+                            id="fechaLimite"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monto">Monto (S/) *</label>
+                        <input
+                            type="number"
+                            id="monto"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estado">Estado *</label>
+                        <select id="estado">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="pagada">Pagada</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria">
+                            <option value="Personal">Personal</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Compras">Compras</option>
+                            <option value="Préstamo">Préstamo</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Trabajo">Trabajo</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="concepto">Concepto / Descripción *</label>
+                        <textarea
+                            id="concepto"
+                            placeholder="Ej. Préstamo para compra de materiales..."
+                            required
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button type="submit" class="btn-primary">
+                        💾 Guardar deuda
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancelarEdicion"
+                        onclick="cancelarEdicion()"
+                        style="display:none;"
+                    >
+                        Cancelar edición
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-outline"
+                        onclick="limpiarFormulario()"
+                    >
+                        🧹 Limpiar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </section>
+
+    <!-- LISTADO -->
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <div>
+                <h2>📋 Registro de deudas</h2>
+            </div>
+
+            <div class="tools">
+
+                <div class="search">
+                    <span class="search-icon">🔎</span>
+
+                    <input
+                        type="text"
+                        id="busqueda"
+                        placeholder="Buscar por nombre o concepto..."
+                        oninput="renderizarDeudas()"
+                    >
+                </div>
+
+                <select
+                    class="filter"
+                    id="filtroEstado"
+                    onchange="renderizarDeudas()"
+                >
+                    <option value="todas">Todos los estados</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="pagada">Pagadas</option>
+                    <option value="vencida">Vencidas</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Persona</th>
+                        <th>Fecha</th>
+                        <th>Fecha límite</th>
+                        <th>Monto</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tablaDeudas"></tbody>
+
+            </table>
+
+            <div id="emptyState" class="empty" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <h3>No hay deudas registradas</h3>
+                <p>Agrega una nueva deuda utilizando el formulario.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    DeudasApp © 2026 — Tus registros se guardan automáticamente en este navegador.
+</footer>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+<div class="modal" id="modalConfirmacion">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h3>⚠️ Confirmar acción</h3>
+
+            <button
+                class="close"
+                onclick="cerrarModal()"
+            >
+                ×
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            <p id="mensajeConfirmacion">
+                ¿Estás seguro de realizar esta acción?
+            </p>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-secondary"
+                onclick="cerrarModal()"
+            >
+                Cancelar
+            </button>
+
+            <button
+                class="btn-danger"
+                id="confirmarAccion"
+            >
+                Confirmar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+    /* =========================================
+       CONFIGURACIÓN
+    ========================================= */
+
+    const STORAGE_KEY = "deudasAppData";
+
+    let deudas = JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+    ) || [];
+
+    let accionPendiente = null;
+
+
+    /* =========================================
+       ELEMENTOS
+    ========================================= */
+
+    const form = document.getElementById("deudaForm");
+
+    const nombre = document.getElementById("nombre");
+    const fecha = document.getElementById("fecha");
+    const fechaLimite = document.getElementById("fechaLimite");
+    const monto = document.getElementById("monto");
+    const concepto = document.getElementById("concepto");
+    const estado = document.getElementById("estado");
+    const categoria = document.getElementById("categoria");
+    const deudaId = document.getElementById("deudaId");
+
+
+    /* =========================================
+       FECHA ACTUAL
+    ========================================= */
+
+    function obtenerFechaActual() {
+
+        const hoy = new Date();
+
+        const año = hoy.getFullYear();
+
+        const mes = String(
+            hoy.getMonth() + 1
+        ).padStart(2, "0");
+
+        const dia = String(
+            hoy.getDate()
+        ).padStart(2, "0");
+
+        return `${año}-${mes}-${dia}`;
+    }
+
+    fecha.value = obtenerFechaActual();
+
+
+    /* =========================================
+       GUARDAR EN LOCALSTORAGE
+    ========================================= */
+
+    function guardarDatos() {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(deudas)
+        );
+
+    }
+
+
+    /* =========================================
+       FORMATEAR MONEDA
+    ========================================= */
+
+    function moneda(valor) {
+
+        return new Intl.NumberFormat(
+            "es-PE",
+            {
+                style: "currency",
+                currency: "PEN"
+            }
+        ).format(valor);
+
+    }
+
+
+    /* =========================================
+       FORMATEAR FECHA
+    ========================================= */
+
+    function formatearFecha(fechaTexto) {
+
+        if (!fechaTexto) {
+            return "—";
+        }
+
+        const partes = fechaTexto.split("-");
+
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+    }
+
+
+    /* =========================================
+       OBTENER ESTADO REAL
+    ========================================= */
+
+    function obtenerEstado(deuda) {
+
+        if (deuda.estado === "pagada") {
+            return "pagada";
+        }
+
+        if (
+            deuda.fechaLimite &&
+            deuda.fechaLimite < obtenerFechaActual()
+        ) {
+            return "vencida";
+        }
+
+        return "pendiente";
+
+    }
+
+
+    /* =========================================
+       AGREGAR / EDITAR
+    ========================================= */
+
+    form.addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        const datos = {
+
+            nombre: nombre.value.trim(),
+
+            fecha: fecha.value,
+
+            fechaLimite: fechaLimite.value,
+
+            monto: parseFloat(monto.value),
+
+            concepto: concepto.value.trim(),
+
+            estado: estado.value,
+
+            categoria: categoria.value
+
+        };
+
+
+        if (!datos.nombre || !datos.fecha || !datos.monto || !datos.concepto) {
+
+            mostrarToast(
+                "Completa todos los campos obligatorios."
+            );
+
+            return;
+
+        }
+
+
+        if (deudaId.value) {
+
+            const indice = deudas.findIndex(
+                deuda => deuda.id === deudaId.value
+            );
+
+            if (indice !== -1) {
+
+                deudas[indice] = {
+                    ...deudas[indice],
+                    ...datos
+                };
+
+                mostrarToast(
+                    "✅ Deuda actualizada correctamente."
+                );
+
+            }
+
+        } else {
+
+            deudas.push({
+
+                id:
+                    Date.now().toString(),
+
+                ...datos,
+
+                fechaCreacion:
+                    new Date().toISOString()
+
+            });
+
+            mostrarToast(
+                "✅ Deuda registrada correctamente."
+            );
+
+        }
+
+
+        guardarDatos();
+
+        renderizarDeudas();
+
+        actualizarEstadisticas();
+
+        limpiarFormulario();
+
+    });
+
+
+    /* =========================================
+       RENDERIZAR TABLA
+    ========================================= */
+
+    function renderizarDeudas() {
+
+        const tabla =
+            document.getElementById("tablaDeudas");
+
+        const emptyState =
+            document.getElementById("emptyState");
+
+        const busqueda =
+            document
+                .getElementById("busqueda")
+                .value
+                .toLowerCase()
+                .trim();
+
+        const filtro =
+            document
+                .getElementById("filtroEstado")
+                .value;
+
+
+        let filtradas = deudas.filter(deuda => {
+
+            const estadoReal =
+                obtenerEstado(deuda);
+
+            const coincideBusqueda =
+                deuda.nombre
+                    .toLowerCase()
+                    .includes(busqueda)
+                ||
+                deuda.concepto
+                    .toLowerCase()
+                    .includes(busqueda);
+
+            const coincideEstado =
+                filtro === "todas"
+                ||
+                estadoReal === filtro;
+
+            return coincideBusqueda &&
+                   coincideEstado;
+
+        });
+
+
+        tabla.innerHTML = "";
+
+
+        if (filtradas.length === 0) {
+
+            emptyState.style.display = "block";
+
+            return;
+
+        }
+
+        emptyState.style.display = "none";
+
+
+        filtradas.sort(
+            (a,b) =>
+                new Date(b.fecha)
+                -
+                new Date(a.fecha)
+        );
+
+
+        filtradas.forEach(deuda => {
+
+            const estadoReal =
+                obtenerEstado(deuda);
+
+            let claseEstado = "";
+            let textoEstado = "";
+
+            if (estadoReal === "pagada") {
+
+                claseEstado = "status-paid";
+                textoEstado = "Pagada";
+
+            } else if (estadoReal === "vencida") {
+
+                claseEstado = "status-overdue";
+                textoEstado = "Vencida";
+
+            } else {
+
+                claseEstado = "status-pending";
+                textoEstado = "Pendiente";
+
+            }
+
+
+            const inicial =
+                deuda.nombre
+                    .charAt(0)
+                    .toUpperCase();
+
+
+            const fila =
+                document.createElement("tr");
+
+
+            fila.innerHTML = `
+
+                <td>
+
+                    <div class="person">
+
+                        <div class="avatar">
+                            ${inicial}
+                        </div>
+
+                        <div>
+
+                            <div class="person-name">
+                                ${escapeHTML(deuda.nombre)}
+                            </div>
+
+                            <div class="person-concept">
+                                ${escapeHTML(deuda.concepto)}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+                <td>
+                    ${formatearFecha(deuda.fecha)}
+                </td>
+
+                <td>
+                    ${formatearFecha(deuda.fechaLimite)}
+                </td>
+
+                <td>
+
+                    <span class="amount">
+                        ${moneda(deuda.monto)}
+                    </span>
+
+                </td>
+
+                <td>
+                    ${escapeHTML(deuda.categoria)}
+                </td>
+
+                <td>
+
+                    <span class="status ${claseEstado}">
+                        ${textoEstado}
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        ${
+                            estadoReal !== "pagada"
+
+                            ?
+
+                            `
+                            <button
+                                class="btn-success btn-small"
+                                onclick="marcarPagada('${deuda.id}')"
+                                title="Marcar como pagada"
+                            >
+                                ✓ Pagar
+                            </button>
+                            `
+
+                            :
+
+                            ""
+                        }
+
+                        <button
+                            class="btn-outline btn-small"
+                            onclick="editarDeuda('${deuda.id}')"
+                            title="Editar"
+                        >
+                            ✏️
+                        </button>
+
+                        <button
+                            class="btn-danger btn-small"
+                            onclick="eliminarDeuda('${deuda.id}')"
+                            title="Eliminar"
+                        >
+                            🗑️
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+            tabla.appendChild(fila);
+
+        });
+
+    }
+
+
+    /* =========================================
+       MARCAR COMO PAGADA
+    ========================================= */
+
+    function marcarPagada(id) {
+
+        const deuda =
+            deudas.find(
+                d => d.id === id
+            );
+
+        if (!deuda) return;
+
+
+        accionPendiente = function() {
+
+            deuda.estado = "pagada";
+
+            deuda.fechaPago =
+                obtenerFechaActual();
+
+            guardarDatos();
+
+            renderizarDeudas();
+
+            actualizarEstadisticas();
+
+            mostrarToast(
+                "✅ Deuda marcada como pagada."
+            );
+
+        };
+
+
+        document.getElementById(
+            "mensajeConfirmacion"
+        ).textContent =
+            `¿Confirmas que la deuda de ${deuda.nombre} por ${moneda(deuda.monto)} ha sido pagada?`;
+
+
+        document
+            .getElementById(
+                "modalConfirmacion"
+            )
+            .classList.add("active");
+
+    }
+
+
+    /* =========================================
+       EDITAR
+    ========================================= */
+
+    function editarDeuda(id) {
+
+        const deuda =
+            deudas.find(
+                d => d.id === id
+            );
+
+        if (!deuda) return;
+
+
+        deudaId.value = deuda.id;
+
+        nombre.value = deuda.nombre;
+
+        fecha.value = deuda.fecha;
+
+        fechaLimite.value =
+            deuda.fechaLimite || "";
+
+        monto.value = deuda.monto;
+
+        concepto.value = deuda.concepto;
+
+        estado.value = deuda.estado;
+
+        categoria.value =
+            deuda.categoria || "Otros";
+
+
+        document.getElementById(
+            "formTitle"
+        ).textContent =
+            "✏️ Editar deuda";
+
+
+        document.getElementById(
+            "cancelarEdicion"
+        ).style.display =
+            "inline-block";
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* =========================================
+       ELIMINAR
+    ========================================= */
+
+    function eliminarDeuda(id) {
+
+        const deuda =
+            deudas.find(
+                d => d.id === id
+            );
+
+        if (!deuda) return;
+
+
+        accionPendiente = function() {
+
+            deudas =
+                deudas.filter(
+                    d => d.id !== id
+                );
+
+            guardarDatos();
+
+            renderizarDeudas();
+
+            actualizarEstadisticas();
+
+            mostrarToast(
+                "🗑️ Deuda eliminada correctamente."
+            );
+
+        };
+
+
+        document.getElementById(
+            "mensajeConfirmacion"
+        ).textContent =
+            `¿Seguro que deseas eliminar la deuda de ${deuda.nombre}? Esta acción no se puede deshacer.`;
+
+
+        document
+            .getElementById(
+                "modalConfirmacion"
+            )
+            .classList.add("active");
+
+    }
+
+
+    /* =========================================
+       CONFIRMAR MODAL
+    ========================================= */
+
+    document
+        .getElementById("confirmarAccion")
+        .addEventListener("click", function() {
+
+            if (accionPendiente) {
+
+                accionPendiente();
+
+                accionPendiente = null;
+
+            }
+
+            cerrarModal();
+
+        });
+
+
+    function cerrarModal() {
+
+        document
+            .getElementById(
+                "modalConfirmacion"
+            )
+            .classList.remove("active");
+
+        accionPendiente = null;
+
+    }
+
+
+    /* =========================================
+       CANCELAR EDICIÓN
+    ========================================= */
+
+    function cancelarEdicion() {
+
+        limpiarFormulario();
+
+    }
+
+
+    /* =========================================
+       LIMPIAR FORMULARIO
+    ========================================= */
+
+    function limpiarFormulario() {
+
+        form.reset();
+
+        deudaId.value = "";
+
+        fecha.value =
+            obtenerFechaActual();
+
+        estado.value = "pendiente";
+
+        categoria.value = "Personal";
+
+
+        document.getElementById(
+            "formTitle"
+        ).textContent =
+            "➕ Registrar nueva deuda";
+
+
+        document.getElementById(
+            "cancelarEdicion"
+        ).style.display =
+            "none";
+
+    }
+
+
+    /* =========================================
+       ESTADÍSTICAS
+    ========================================= */
+
+    function actualizarEstadisticas() {
+
+        let total = 0;
+
+        let pendiente = 0;
+
+        let pagado = 0;
+
+        let vencidas = 0;
+
+
+        deudas.forEach(deuda => {
+
+            total += Number(deuda.monto);
+
+
+            const estadoReal =
+                obtenerEstado(deuda);
+
+
+            if (estadoReal === "pagada") {
+
+                pagado += Number(deuda.monto);
+
+            } else {
+
+                pendiente += Number(deuda.monto);
+
+            }
+
+
+            if (estadoReal === "vencida") {
+
+                vencidas++;
+
+            }
+
+        });
+
+
+        document.getElementById(
+            "totalRegistrado"
+        ).textContent =
+            moneda(total);
+
+
+        document.getElementById(
+            "totalPendiente"
+        ).textContent =
+            moneda(pendiente);
+
+
+        document.getElementById(
+            "totalPagado"
+        ).textContent =
+            moneda(pagado);
+
+
+        document.getElementById(
+            "cantidadVencidas"
+        ).textContent =
+            vencidas;
+
+    }
+
+
+    /* =========================================
+       EXPORTAR DATOS
+    ========================================= */
+
+    function exportarDatos() {
+
+        if (deudas.length === 0) {
+
+            mostrarToast(
+                "No existen datos para exportar."
+            );
+
+            return;
+
+        }
+
+
+        const datos =
+            JSON.stringify(
+                deudas,
+                null,
+                4
+            );
+
+
+        const blob =
+            new Blob(
+                [datos],
+                {
+                    type: "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const enlace =
+            document.createElement("a");
+
+
+        enlace.href = url;
+
+        enlace.download =
+            "deudas-backup.json";
+
+
+        enlace.click();
+
+
+        URL.revokeObjectURL(url);
+
+
+        mostrarToast(
+            "📥 Datos exportados correctamente."
+        );
+
+    }
+
+
+    /* =========================================
+       ESCAPAR HTML
+    ========================================= */
+
+    function escapeHTML(text) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent =
+            text || "";
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================================
+       TOAST
+    ========================================= */
+
+    function mostrarToast(mensaje) {
+
+        const toast =
+            document.getElementById("toast");
+
+        toast.textContent = mensaje;
+
+        toast.classList.add("show");
+
+
+        setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        }, 3000);
+
+    }
+
+
+    /* =========================================
+       INICIO
+    ========================================= */
+
+    renderizarDeudas();
+
+    actualizarEstadisticas();
+
+</script>
+
+</body>
+</html>
